@@ -1,4 +1,5 @@
 import GameObject from "../model/gameObject";
+import {FIELD_HEIGHT, FIELD_WIDTH} from "../constants";
 
 export default class Field {
     private context: CanvasRenderingContext2D;
@@ -8,8 +9,8 @@ export default class Field {
         this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
         this.context = this.canvas?.getContext("2d");
 
-        this.canvas.width = 1000;
-        this.canvas.height = 700;
+        this.canvas.width = FIELD_WIDTH;
+        this.canvas.height = FIELD_HEIGHT;
 
         return this.canvas;
     }

@@ -31,6 +31,10 @@ export default class Vector {
         }
     }
 
+    public clone(): Vector {
+        return new Vector(this.x, this.y);
+    }
+
     public get heading() {
         return Math.atan2(this.y, this.x);
     }
