@@ -4,4 +4,5 @@ export enum Behaviour {
     FLEE = 'flee',
     WANDER = 'wander',
     SEPARATE = 'separate',
+    FLOCK = 'flock',
 }

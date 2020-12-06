@@ -1,6 +1,7 @@
 import Vector from "./vector";
 import {DANGEROUS_WALL_DISTANCE, FIELD_HEIGHT, FIELD_WIDTH} from "../constants";
 import {Behaviour} from "./behaviour.enum";
+import Game from "./game";
 
 const ANGLE_CHANGE = 30;
 
@@ -20,6 +21,7 @@ export default class GameObject {
         [Behaviour.WANDER]: this.wander.bind(this),
         [Behaviour.ARRIVE]: this.arrive.bind(this),
         [Behaviour.SEPARATE]: this.separate.bind(this),
+        [Behaviour.FLOCK]: this.flock.bind(this),
     }
 
     constructor(x: number, y: number, startBehaviour?: Behaviour) {
@@ -30,7 +32,8 @@ export default class GameObject {
     }
 
     simulateCurrentBehaviour(...args: any[]): void {
-        this.BEHAVIOURS[this.currentBehaviour](...args);
+        const force = this.BEHAVIOURS[this.currentBehaviour](...args);
+        this.applyForce(force)
         this.stayWithinWalls();
         this.update();
     }
@@ -46,26 +49,26 @@ export default class GameObject {
         this.acceleration.mult(0);
     }
 
-    public seek(target: Vector): void {
+    public seek(target: Vector): Vector {
         const desired = Vector.sub(target, this.location);
         desired.normalize();
         desired.mult(this.maxSpeed);
         const steer = Vector.sub(desired, this.velocity);
         steer.limit(this.maxForce);
-        this.applyForce(steer);
+        return steer;
     }
 
-    public flee(target: Vector): void {
+    public flee(target: Vector): Vector {
         const desired = Vector.sub(target, this.location);
         desired.normalize();
         desired.mult(this.maxSpeed);
         desired.mult(-1)
         const steer = Vector.sub(desired, this.velocity);
         steer.limit(this.maxForce);
-        this.applyForce(steer);
+        return steer;
     }
 
-    public arrive(target: Vector): void {
+    public arrive(target: Vector): Vector {
         const desired = Vector.sub(target, this.location);
         const distance = desired.length;
         desired.normalize();
@@ -78,10 +81,10 @@ export default class GameObject {
         }
         const steer = Vector.sub(desired, this.velocity);
         steer.limit(this.maxForce);
-        this.applyForce(steer);
+        return steer;
     }
 
-    public wander(): void {
+    public wander(): Vector {
         const circleCenter = this.velocity.clone();
         circleCenter.normalize();
         circleCenter.mult(5);
@@ -91,7 +94,7 @@ export default class GameObject {
         this.wanderAngle += Math.random() > .5 ? -ANGLE_CHANGE : ANGLE_CHANGE;
         const wanderForce = Vector.sum(circleCenter, displacement);
         wanderForce.limit(this.maxForce);
-        this.applyForce(wanderForce);
+        return wanderForce;
     }
 
     private stayWithinWalls(): void {
@@ -110,12 +113,12 @@ export default class GameObject {
 
         if (desired) {
             const steer = Vector.sub(desired, this.velocity);
-            steer.limit(this.maxForce * 2);
+            steer.limit(this.maxForce * 2.5);
             this.applyForce(steer)
         }
     }
 
-    private separate(objects: GameObject[]): void {
+    private separate(objects: GameObject[]): Vector {
         const desiredSeparation = this.radius * 10;
         const desired = new Vector(0, 0);
         let count = 0;
@@ -136,8 +139,72 @@ export default class GameObject {
             desired.mult(this.maxSpeed);
             const steer = Vector.sub(desired, this.velocity)
             steer.limit(this.maxForce);
-            this.applyForce(steer);
+            return steer;
         }
+
+        return new Vector(0, 0)
+    }
+
+    protected flock(objects: GameObject[]): Vector {
+        const separationForce = this.separate(objects);
+        const alignmentForce = this.align(objects);
+        const cohesionForce = this.cohesion(objects);
+
+        separationForce.mult(1.5);
+        alignmentForce.mult(1);
+        cohesionForce.mult(1);
+
+        const resultForce = new Vector(0, 0);
+        resultForce.add(separationForce);
+        resultForce.add(alignmentForce);
+        resultForce.add(cohesionForce);
+
+        return resultForce;
+    }
+
+    private align(objects: GameObject[]): Vector {
+        const desired = new Vector(0, 0);
+        const neighborDist = 100;
+        let count = 0;
+        objects.forEach(object => {
+            const distance = Vector.dist(this.location, object.location);
+            if (distance > 0 && distance < neighborDist) {
+                desired.add(object.velocity);
+                count++;
+            }
+        })
+
+        if (count > 0) {
+            desired.mult(1 / count)
+            desired.normalize();
+            desired.mult(this.maxSpeed);
+            const steer = Vector.sub(desired, this.velocity);
+            steer.limit(this.maxForce);
+            return steer;
+        }
+
+        return new Vector(0, 0)
+    }
+
+    private cohesion(objects: GameObject[]): Vector {
+        const desired = new Vector(0, 0);
+        const neighborDist = 75;
+        let count = 0;
+
+        objects.forEach(object => {
+            const distance = Vector.dist(this.location, object.location);
+            if (distance > 0 && distance < neighborDist) {
+                desired.add(object.location);
+                count++;
+            }
+        })
+
+        if (count > 0) {
+            desired.mult(1 / count);
+            return this.seek(desired)
+        }
+
+        return new Vector(0, 0);
     }
 
     private setAngle(vector: Vector, value: number): void {
