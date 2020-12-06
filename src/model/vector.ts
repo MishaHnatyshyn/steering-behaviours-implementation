@@ -39,6 +39,18 @@ export default class Vector {
         return Math.atan2(this.y, this.x);
     }
 
+    public div(vector: Vector): void {
+        this.x /= vector.x;
+        this.y /= vector.y;
+    }
+
+    static dist(firstVector: Vector, secondVector: Vector): number {
+        console.log(firstVector, secondVector)
+        const xDiff = firstVector.x - secondVector.x;
+        const yDiff = firstVector.y - secondVector.y;
+        return Math.sqrt(xDiff ** 2 + yDiff ** 2);
+    }
+
     static sum(firstVector: Vector, secondVector: Vector): Vector {
         return new Vector(firstVector.x + secondVector.x, firstVector.y + secondVector.y);
     }

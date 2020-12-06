@@ -12,23 +12,25 @@ export default class GameObject {
     public acceleration: Vector;
     public radius: number = 5;
     public wanderAngle: number = 0;
-    public currentBehaviour: Behaviour = Behaviour.WANDER;
+    public currentBehaviour: Behaviour;
 
     public BEHAVIOURS = {
         [Behaviour.SEEK]: this.seek.bind(this),
         [Behaviour.FLEE]: this.flee.bind(this),
         [Behaviour.WANDER]: this.wander.bind(this),
         [Behaviour.ARRIVE]: this.arrive.bind(this),
+        [Behaviour.SEPARATE]: this.separate.bind(this),
     }
 
-    constructor(x: number, y: number) {
+    constructor(x: number, y: number, startBehaviour?: Behaviour) {
         this.acceleration = new Vector(0, 0);
         this.velocity = new Vector(0, 0);
         this.location = new Vector(x, y);
+        this.currentBehaviour = startBehaviour || Behaviour.WANDER
     }
 
-    simulateCurrentBehaviour(target?: Vector): void {
-        this.BEHAVIOURS[this.currentBehaviour](target);
+    simulateCurrentBehaviour(...args: any[]): void {
+        this.BEHAVIOURS[this.currentBehaviour](...args);
         this.stayWithinWalls();
         this.update();
     }
@@ -110,6 +112,31 @@ export default class GameObject {
             const steer = Vector.sub(desired, this.velocity);
             steer.limit(this.maxForce * 2);
             this.applyForce(steer)
+        }
+    }
+
+    private separate(objects: GameObject[]): void {
+        const desiredSeparation = this.radius * 10;
+        const desired = new Vector(0, 0);
+        let count = 0;
+        objects.forEach(object => {
+            const distanceToObject = Vector.dist(this.location, object.location);
+            if (distanceToObject > 0 && distanceToObject < desiredSeparation) {
+                const diff = Vector.sub(this.location, object.location);
+                diff.normalize();
+                diff.mult(1 / distanceToObject);
+                desired.add(diff);
+                count++;
+            }
+        })
+
+        if (count > 0) {
+            desired.mult(1 / count);
+            desired.normalize();
+            desired.mult(this.maxSpeed);
+            const steer = Vector.sub(desired, this.velocity)
+            steer.limit(this.maxForce);
+            this.applyForce(steer);
         }
     }
 

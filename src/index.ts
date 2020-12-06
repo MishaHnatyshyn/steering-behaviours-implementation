@@ -2,9 +2,11 @@
 import Field from "./view/Field";
 import GameObject from "./model/gameObject";
 import Vector from "./model/vector";
+import {Behaviour} from "./model/behaviour.enum";
+import {FIELD_HEIGHT, FIELD_WIDTH} from "./constants";
 
 const field = new Field();
-const objects = new Array(50).fill(0).map(() => new GameObject(500, 350))
+const objects = new Array(30).fill(0).map(() => new GameObject(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT, Behaviour.SEPARATE))
 const gameObject = new GameObject(500, 350);
 const mouse = new Vector(0, 0);
 const canvas = document.getElementById('canvas')
@@ -18,12 +20,16 @@ field.createCanvas();
 
 const updateFrame = () => {
     objects.forEach((object) => {
-        object.simulateCurrentBehaviour();
+        object.simulateCurrentBehaviour(objects);
     })
     // gameObject.wander()
     // gameObject.update();
     // field.drawField([gameObject])
     field.drawField(objects)
+
+    requestAnimationFrame(updateFrame)
 }
 
-setInterval(updateFrame, 1000 / 60)
+updateFrame();
+
+// setInterval(updateFrame, 1000 / 30)
