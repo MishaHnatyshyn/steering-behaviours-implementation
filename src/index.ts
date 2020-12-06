@@ -16,7 +16,7 @@ canvas.addEventListener('mousemove', (e) => {
 field.createCanvas();
 
 const updateFrame = () => {
-    gameObject.flee(mouse)
+    gameObject.arrive(mouse)
     gameObject.update();
     field.drawField([gameObject])
 }

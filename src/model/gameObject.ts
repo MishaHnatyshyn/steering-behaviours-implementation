@@ -44,4 +44,20 @@ export default class GameObject {
         steer.limit(this.maxForce);
         this.applyForce(steer);
     }
+
+    arrive(target: Vector): void {
+        const desired = Vector.sub(target, this.location);
+        const distance = desired.length;
+        desired.normalize();
+
+        if (distance < 100) {
+            const multiplier = distance / 100 * this.maxSpeed
+            desired.mult(multiplier);
+        } else {
+            desired.mult(this.maxSpeed);
+        }
+        const steer = Vector.sub(desired, this.velocity);
+        steer.limit(this.maxForce);
+        this.applyForce(steer);
+    }
 }
