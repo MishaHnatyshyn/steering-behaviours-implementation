@@ -33,14 +33,16 @@ export default class Hunter extends Character {
   }
 
   private handleKeyPress(e: KeyboardEvent): void {
-    if (e.key === ' ' && this.bulletsCount) {
+    if (e.key === ' ') {
       this.shot();
     }
   }
 
   private shot(): void {
-    const bullet = new Bullet(this.location, this.velocity.clone())
-    this.bullets.push(bullet);
-    this.bulletsCount--;
+    if(this.bulletsCount) {
+      const bullet = new Bullet(this.location, this.velocity.clone())
+      this.bullets.push(bullet);
+      this.bulletsCount--;
+    }
   }
 }
