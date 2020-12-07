@@ -13,11 +13,6 @@ const getCharacterImage = (src) => {
     return image;
 }
 
-const CHARACTERS_COLOR_MAP = {
-    [Characters.HUNTER]: 'red',
-    [Characters.WOLF]: 'gray',
-    [Characters.RABBIT]: 'blue',
-}
 const CHARACTERS_IMAGES_MAP = {
     [Characters.HUNTER]: getCharacterImage(hunter),
     [Characters.WOLF]: getCharacterImage(wolf),
@@ -53,18 +48,6 @@ export default class Field {
             this.context.translate(object.location.x - 10, object.location.y - 10);
             this.context.rotate(theta);
             this.context.drawImage(image, -10, -10, object.radius * 2, object.radius * 2);
-
-            // const theta = object.velocity.heading + Math.PI / 2;
-            // this.context.save();
-            // this.context.translate(object.location.x, object.location.y);
-            // this.context.rotate(theta);
-            // this.context.beginPath();
-            // this.context.moveTo(0, -object.radius * 2);
-            // this.context.lineTo(-object.radius, object.radius * 2);
-            // this.context.lineTo(object.radius, object.radius * 2);
-            // this.context.fillStyle = CHARACTERS_COLOR_MAP[object.characterType];
-            // this.context.fill();
-            // this.context.closePath();
             this.context.restore();
         }
     }
@@ -77,5 +60,9 @@ export default class Field {
         this.context.strokeRect(0, 0, this.canvas.width, this.canvas.height);
 
         objects.forEach(this.drawObject.bind(this));
+    }
+
+    public drawBulletsAmount(amount: number, textField): void {
+        textField.innerText = amount;
     }
 }

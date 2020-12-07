@@ -2,6 +2,7 @@ import {Characters} from '../characters.enum';
 import Character from '../character';
 import Bullet from "./bullet";
 import Vector from "../vector";
+import {canvas} from './../../constants'
 
 export default class Hunter extends Character {
   public baseMaxSpeed: number = 2;
@@ -29,7 +30,7 @@ export default class Hunter extends Character {
 
   private startListeningUserActions(): void {
     window.addEventListener('keypress', this.handleKeyPress)
-    window.addEventListener('click', this.shot)
+    canvas.addEventListener('click', this.shot)
   }
 
   private handleKeyPress(e: KeyboardEvent): void {
