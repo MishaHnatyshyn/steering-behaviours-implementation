@@ -6,7 +6,7 @@ export default class GameObject {
     public velocity: Vector;
     public location: Vector;
     public acceleration: Vector;
-    public radius: number = 5;
+    public radius: number = 10;
 
 
     public get maxSpeed(): number {

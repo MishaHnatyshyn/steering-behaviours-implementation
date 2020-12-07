@@ -1,4 +1,3 @@
-import {Behaviour} from "../behaviour.enum";
 import Character from "../character";
 import {Characters} from "../characters.enum";
 import Vector from "../vector";
@@ -11,18 +10,15 @@ export default class Bullet extends Character {
         public startLocation: Vector,
         public direction: Vector,
     ) {
-        super(startLocation.x, startLocation.y, Behaviour.BULLET);
+        super(startLocation.x, startLocation.y);
         this.characterType = Characters.BULLET;
     }
 
-    getBehavioursMap() {
-        return {
-            ...super.getBehavioursMap(),
-            [Behaviour.BULLET]: this.fly.bind(this)
-        }
+    public getCurrentBehaviourForce(objects: Character[]): Vector {
+        return this.fly(objects);
     }
 
-    fly(objects: Character[]): Vector {
+    private fly(objects: Character[]): Vector {
         if (Vector.dist(this.location, this.startLocation) > this.maxShotDistance) {
             this.kill();
             return new Vector(0, 0);
@@ -30,7 +26,7 @@ export default class Bullet extends Character {
 
         objects.forEach((enemy) => {
             const dist = Vector.dist(this.location, enemy.location);
-            if (dist < 10 && enemy.characterType !== Characters.HUNTER) {
+            if (dist < enemy.radius && enemy.characterType !== Characters.HUNTER) {
                 enemy.kill();
                 this.kill();
             }

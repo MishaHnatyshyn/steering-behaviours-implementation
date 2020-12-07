@@ -1,5 +1,4 @@
 import Character from '../character';
-import {Behaviour} from '../behaviour.enum';
 import {Characters} from '../characters.enum';
 import Vector from '../vector';
 
@@ -16,15 +15,19 @@ export default class Wolf extends Character {
   }
 
   constructor(x, y) {
-    super(x, y, Behaviour.HUNT);
+    super(x, y);
     this.characterType = Characters.WOLF;
     this.decreasePower = this.decreasePower.bind(this);
     this.powerTimer = window.setInterval(this.decreasePower, 1000);
   }
 
-  kill() {
+  public kill(): void {
     clearInterval(this.powerTimer)
     super.kill();
+  }
+
+  public getCurrentBehaviourForce(objects: Character[]): Vector {
+    return this.hunt(objects);
   }
 
   private decreasePower(): void {
@@ -35,19 +38,12 @@ export default class Wolf extends Character {
     }
   }
 
-  getBehavioursMap() {
-    return {
-      ...super.getBehavioursMap(),
-      [Behaviour.HUNT]: this.hunt.bind(this)
-    }
-  }
-
   private eatEnemy(enemy: Character): void {
     this.power += Wolf.ENEMIES_POWER_REWARD[enemy.characterType];
     enemy.kill();
   }
 
-  public hunt(objects: Character[]): Vector {
+  private hunt(objects: Character[]): Vector {
     const enemies = objects.filter(object => Wolf.ENEMIES.includes(object.characterType));
 
     const neighborDist = 100;
@@ -55,7 +51,7 @@ export default class Wolf extends Character {
     const theNearestEnemy = enemies
       .map(enemy => ({ enemy, dist: Vector.dist(this.location, enemy.location)}))
       .filter((item) => {
-        if (item.dist <= 5) {
+        if (item.dist <= item.enemy.radius) {
           this.eatEnemy(item.enemy)
           return false;
         }

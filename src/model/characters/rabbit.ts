@@ -1,4 +1,3 @@
-import {Behaviour} from '../behaviour.enum';
 import {Characters} from '../characters.enum';
 import Vector from '../vector';
 import Character from '../character';
@@ -8,16 +7,12 @@ export default class Rabbit extends Character {
   public baseMaxSpeed: number = 6;
 
   constructor(x, y) {
-    super(x, y, Behaviour.SEPARATE);
+    super(x, y);
     this.characterType = Characters.RABBIT;
     this.separate = this.separate.bind(this)
   }
 
-  public get maxSpeed(): number {
-    return this.currentBehaviour === Behaviour.SEPARATE ? this.baseMaxSpeed * 2.5 : this.baseMaxSpeed;
-  }
-
-  public separate(objects: GameObject[]): Vector {
+  public getCurrentBehaviourForce(objects: GameObject[]): Vector {
     const force: Vector = super.separate(objects)
     if (force.x === 0 && force.y === 0) {
       return this.wander()

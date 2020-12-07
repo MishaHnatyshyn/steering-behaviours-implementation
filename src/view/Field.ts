@@ -2,11 +2,27 @@ import GameObject from "../model/gameObject";
 import {FIELD_HEIGHT, FIELD_WIDTH} from "../constants";
 import {Characters} from '../model/characters.enum';
 import Character from '../model/character';
+const hunter = 'images/hunter.png';
+const wolf = 'images/wolf.png';
+const rabbit = 'images/rabbit.png';
+const deer = 'images/deer.png';
+
+const getCharacterImage = (src) => {
+    const image = new Image(20, 20);
+    image.src = src;
+    return image;
+}
 
 const CHARACTERS_COLOR_MAP = {
     [Characters.HUNTER]: 'red',
     [Characters.WOLF]: 'gray',
     [Characters.RABBIT]: 'blue',
+}
+const CHARACTERS_IMAGES_MAP = {
+    [Characters.HUNTER]: getCharacterImage(hunter),
+    [Characters.WOLF]: getCharacterImage(wolf),
+    [Characters.RABBIT]: getCharacterImage(rabbit),
+    [Characters.FALLOW_DEER]: getCharacterImage(deer),
 }
 
 export default class Field {
@@ -31,17 +47,24 @@ export default class Field {
             this.context.fill();
             this.context.restore();
         } else {
+            const image = CHARACTERS_IMAGES_MAP[object.characterType]
             const theta = object.velocity.heading + Math.PI / 2;
             this.context.save();
-            this.context.translate(object.location.x, object.location.y);
+            this.context.translate(object.location.x - 10, object.location.y - 10);
             this.context.rotate(theta);
-            this.context.beginPath();
-            this.context.moveTo(0, -object.radius * 2);
-            this.context.lineTo(-object.radius, object.radius * 2);
-            this.context.lineTo(object.radius, object.radius * 2);
-            this.context.fillStyle = CHARACTERS_COLOR_MAP[object.characterType];
-            this.context.fill();
-            this.context.closePath();
+            this.context.drawImage(image, -10, -10, object.radius * 2, object.radius * 2);
+
+            // const theta = object.velocity.heading + Math.PI / 2;
+            // this.context.save();
+            // this.context.translate(object.location.x, object.location.y);
+            // this.context.rotate(theta);
+            // this.context.beginPath();
+            // this.context.moveTo(0, -object.radius * 2);
+            // this.context.lineTo(-object.radius, object.radius * 2);
+            // this.context.lineTo(object.radius, object.radius * 2);
+            // this.context.fillStyle = CHARACTERS_COLOR_MAP[object.characterType];
+            // this.context.fill();
+            // this.context.closePath();
             this.context.restore();
         }
     }

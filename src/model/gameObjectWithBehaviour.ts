@@ -1,32 +1,22 @@
 import Vector from "./vector";
 import {DANGEROUS_WALL_DISTANCE, FIELD_HEIGHT, FIELD_WIDTH} from "../constants";
-import {Behaviour} from "./behaviour.enum";
 import GameObject from './gameObject';
 
 const ANGLE_CHANGE = 30;
 
 export default class GameObjectWithBehaviour extends GameObject {
     public wanderAngle: number = 0;
-    public currentBehaviour: Behaviour;
-    public getBehavioursMap() {
-        return {
-            [Behaviour.SEEK]: this.seek.bind(this),
-            [Behaviour.FLEE]: this.flee.bind(this),
-            [Behaviour.FLOCK]: this.flock.bind(this),
-            [Behaviour.ARRIVE]: this.arrive.bind(this),
-            [Behaviour.ALIGN]: this.align.bind(this),
-            [Behaviour.SEPARATE]: this.separate.bind(this),
-            [Behaviour.COHESION]: this.cohesion.bind(this),
-        }
-    }
 
-    constructor(x: number, y: number, startBehaviour?: Behaviour) {
+    constructor(x: number, y: number) {
         super(x, y)
-        this.currentBehaviour = startBehaviour || Behaviour.WANDER
     }
 
-    simulateCurrentBehaviour(...args: any[]): void {
-        const force = this.getBehavioursMap()[this.currentBehaviour](...args);
+    public getCurrentBehaviourForce(...ars: any[]): Vector {
+        return this.wander()
+    }
+
+    public simulateCurrentBehaviour(...args: any[]): void {
+        const force = this.getCurrentBehaviourForce(...args);
         this.applyForce(force)
         this.stayWithinWalls();
         this.update();
@@ -96,7 +86,7 @@ export default class GameObjectWithBehaviour extends GameObject {
 
         if (desired) {
             const steer = Vector.sub(desired, this.velocity);
-            steer.limit(this.maxForce * 2.5);
+            steer.limit(this.maxForce * 3.5);
             this.applyForce(steer)
         }
     }

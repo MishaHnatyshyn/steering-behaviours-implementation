@@ -2,6 +2,7 @@ const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: './src/index.ts',
@@ -15,7 +16,6 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         contentBase: path.resolve(__dirname, './dist'),
-        open: true,
         compress: true,
         hot: true,
         port: 3000,
@@ -40,7 +40,7 @@ module.exports = {
                 ],
             },
             {
-                test: /\.(svg|woff|woff2|ttf|eot|otf)([\?]?.*)$/,
+                test: /\.(svg|woff|woff2|ttf|eot|otf|png)([\?]?.*)$/,
                 use: {loader: 'file-loader?name=assets/fonts/[name].[ext]'},
             }
         ],
@@ -53,5 +53,10 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'style-[hash].css',
         }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: "public/images", to: "images" },
+            ],
+        })
     ]
 };

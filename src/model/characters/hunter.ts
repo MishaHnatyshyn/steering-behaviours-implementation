@@ -1,37 +1,45 @@
-import {Behaviour} from '../behaviour.enum';
 import {Characters} from '../characters.enum';
 import Character from '../character';
 import Bullet from "./bullet";
+import Vector from "../vector";
 
 export default class Hunter extends Character {
   public baseMaxSpeed: number = 2;
   public bulletsCount = 10;
   public bullets: Bullet[] = []
+  public radius = 13;
 
   constructor(x, y) {
-    super(x, y, Behaviour.ARRIVE);
+    super(x, y);
     this.characterType = Characters.HUNTER;
     this.handleKeyPress = this.handleKeyPress.bind(this);
-    this.startListeningKeyPress();
+    this.shot = this.shot.bind(this);
+    this.startListeningUserActions();
   }
 
-  startListeningKeyPress(): void {
+  public getCurrentBehaviourForce(target: Vector): Vector {
+    return this.arrive(target);
+  }
+
+  public kill(): void {
+    window.removeEventListener('keypress', this.handleKeyPress);
+    window.removeEventListener('click', this.shot);
+    super.kill();
+  }
+
+  private startListeningUserActions(): void {
     window.addEventListener('keypress', this.handleKeyPress)
+    window.addEventListener('click', this.shot)
   }
 
-  handleKeyPress(e: KeyboardEvent): void {
+  private handleKeyPress(e: KeyboardEvent): void {
     if (e.key === ' ' && this.bulletsCount) {
       this.shot();
     }
   }
 
-  kill() {
-    window.removeEventListener('keypress', this.handleKeyPress)
-    super.kill();
-  }
-
-  shot(): void {
-    const bullet = new Bullet(this.location, this.velocity)
+  private shot(): void {
+    const bullet = new Bullet(this.location, this.velocity.clone())
     this.bullets.push(bullet);
     this.bulletsCount--;
   }
