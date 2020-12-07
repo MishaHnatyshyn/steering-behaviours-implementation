@@ -3,4 +3,5 @@ export enum Characters {
   HUNTER = 'hunter',
   RABBIT = 'rabbit',
   FALLOW_DEER = 'fallowDeer',
+  BULLET = 'bullet',
 }

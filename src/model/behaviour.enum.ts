@@ -8,4 +8,5 @@ export enum Behaviour {
     COHESION = 'cohesion',
     ALIGN = 'align',
     HUNT = 'hunt',
+    BULLET = 'bullet',
 }

@@ -24,18 +24,26 @@ export default class Field {
     }
 
     public drawObject(object: Character): void {
-        const theta = object.velocity.heading + Math.PI / 2;
-        this.context.save();
-        this.context.translate(object.location.x, object.location.y);
-        this.context.rotate(theta);
-        this.context.beginPath();
-        this.context.moveTo(0, -object.radius * 2);
-        this.context.lineTo(-object.radius, object.radius * 2);
-        this.context.lineTo(object.radius, object.radius * 2);
-        this.context.fillStyle = CHARACTERS_COLOR_MAP[object.characterType];
-        this.context.fill();
-        this.context.closePath();
-        this.context.restore();
+        if (object.characterType === Characters.BULLET) {
+            this.context.beginPath()
+            this.context.arc(object.location.x, object.location.y, 3, 0, 2 * Math.PI);
+            this.context.fillStyle = 'red';
+            this.context.fill();
+            this.context.restore();
+        } else {
+            const theta = object.velocity.heading + Math.PI / 2;
+            this.context.save();
+            this.context.translate(object.location.x, object.location.y);
+            this.context.rotate(theta);
+            this.context.beginPath();
+            this.context.moveTo(0, -object.radius * 2);
+            this.context.lineTo(-object.radius, object.radius * 2);
+            this.context.lineTo(object.radius, object.radius * 2);
+            this.context.fillStyle = CHARACTERS_COLOR_MAP[object.characterType];
+            this.context.fill();
+            this.context.closePath();
+            this.context.restore();
+        }
     }
 
     public drawField(objects: GameObject[]): void {

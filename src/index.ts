@@ -12,7 +12,7 @@ const field = new Field();
 // const objects = new Array(30).fill(0).map(() => new GameObject(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT, Behaviour.FLOCK));
 
 const rabbits = new Array(10).fill(0).map(() => new Rabbit(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
-const wolves = new Array(10).fill(0).map(() => new Wolf(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
+const wolves = [] //new Array(10).fill(0).map(() => new Wolf(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
 const hunter = new Hunter(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT)
 const objects = [...rabbits, ...wolves];
 
@@ -32,10 +32,15 @@ const updateFrame = () => {
     objects.forEach((object) => {
         object.simulateCurrentBehaviour(characters);
     })
+
+    const bullets = hunter.bullets.filter((bullet) => !bullet.isDead);
+
+    bullets.forEach((bullet) => bullet.simulateCurrentBehaviour(characters))
+
     if (!hunter.isDead) {
         hunter.simulateCurrentBehaviour(mouse)
     }
-    field.drawField(characters)
+    field.drawField([...characters, ...bullets])
 
     requestAnimationFrame(updateFrame)
 }
