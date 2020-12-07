@@ -1,5 +1,13 @@
 import GameObject from "../model/gameObject";
 import {FIELD_HEIGHT, FIELD_WIDTH} from "../constants";
+import {Characters} from '../model/characters.enum';
+import Character from '../model/character';
+
+const CHARACTERS_COLOR_MAP = {
+    [Characters.HUNTER]: 'red',
+    [Characters.WOLF]: 'gray',
+    [Characters.RABBIT]: 'blue',
+}
 
 export default class Field {
     private context: CanvasRenderingContext2D;
@@ -15,7 +23,7 @@ export default class Field {
         return this.canvas;
     }
 
-    public drawObject(object: GameObject): void {
+    public drawObject(object: Character): void {
         const theta = object.velocity.heading + Math.PI / 2;
         this.context.save();
         this.context.translate(object.location.x, object.location.y);
@@ -24,7 +32,7 @@ export default class Field {
         this.context.moveTo(0, -object.radius * 2);
         this.context.lineTo(-object.radius, object.radius * 2);
         this.context.lineTo(object.radius, object.radius * 2);
-        this.context.fillStyle = 'red';
+        this.context.fillStyle = CHARACTERS_COLOR_MAP[object.characterType];
         this.context.fill();
         this.context.closePath();
         this.context.restore();

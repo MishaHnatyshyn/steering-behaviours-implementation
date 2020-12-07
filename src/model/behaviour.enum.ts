@@ -5,4 +5,7 @@ export enum Behaviour {
     WANDER = 'wander',
     SEPARATE = 'separate',
     FLOCK = 'flock',
+    COHESION = 'cohesion',
+    ALIGN = 'align',
+    HUNT = 'hunt',
 }

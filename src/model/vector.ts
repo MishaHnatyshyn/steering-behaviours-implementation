@@ -18,7 +18,6 @@ export default class Vector {
         return Math.sqrt(this.x ** 2 + this.y ** 2);
     }
 
-
     public add(vector: Vector): void {
         this.x += vector.x;
         this.y += vector.y;
@@ -45,7 +44,6 @@ export default class Vector {
     }
 
     static dist(firstVector: Vector, secondVector: Vector): number {
-        console.log(firstVector, secondVector)
         const xDiff = firstVector.x - secondVector.x;
         const yDiff = firstVector.y - secondVector.y;
         return Math.sqrt(xDiff ** 2 + yDiff ** 2);
