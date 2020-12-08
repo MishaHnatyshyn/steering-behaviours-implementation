@@ -7,12 +7,11 @@ import {
     DEFAULT_DEERS_AMOUNT,
     DEFAULT_RABBITS_AMOUNT,
     DEFAULT_WOLVES_AMOUNT,
-    FIELD_HEIGHT,
-    FIELD_WIDTH
 } from "../constants";
 import Vector from "./vector";
 import Field from "../view/Field";
 import FallowDeer from './characters/fallowDeer';
+import CharactersGenerator from "./charactersGenerator";
 
 const bulletsNumber = document.getElementById('bulletsNumber');
 const bulletsAmountText = document.getElementById('bulletsAmountText');
@@ -21,7 +20,6 @@ export default class Game {
     private rabbits: Rabbit[] = []
     private wolves: Wolf[] = []
     private deers: FallowDeer[] = []
-    private deerGroups: FallowDeer[][] = []
     private hunter: Hunter = null;
     private objects: Character[] = [];
     private mouse = new Vector(0, 0);
@@ -32,42 +30,12 @@ export default class Game {
         this.updateFrame();
     }
 
-    public getRandIntInRange(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
     public startGame(rabbitsCount = DEFAULT_RABBITS_AMOUNT, wolvesCount = DEFAULT_WOLVES_AMOUNT, deersCount = DEFAULT_DEERS_AMOUNT): void{
         bulletsAmountText.style.display = 'block';
-
-        const minDeerGroupsCount = Math.floor(deersCount / 8) + 1;
-        const maxDeerGroupsCount = Math.floor(deersCount / 3);
-        const deerGroupsCount = this.getRandIntInRange(minDeerGroupsCount, maxDeerGroupsCount);
-        let deersLeft = deersCount;
-        this.deerGroups = new Array(deerGroupsCount).fill(0).map((_, index) => {
-            const groupsLeft = deerGroupsCount - index - 1;
-            const maxAvailAbleDeers = deersLeft - 3 * groupsLeft;
-            const maxDeersInGroup = Math.min(maxAvailAbleDeers, 8);
-            const deersInGroup = index === deerGroupsCount - 1 ? deersLeft : this.getRandIntInRange(3, maxDeersInGroup);
-            deersLeft -= deersInGroup;
-            const x = Math.random() * FIELD_WIDTH;
-            const y = Math.random() * FIELD_HEIGHT;
-            return new Array(deersInGroup).fill(0)
-                .map(() => new FallowDeer(
-                    this.getRandIntInRange(x - 10, x + 10),
-                    this.getRandIntInRange(y - 10, y + 10),
-                    index
-                    )
-                )
-        })
-
-        console.log(this.deerGroups);
-
-        this.deers = this.deerGroups.flat()
-
-
-        this.rabbits = new Array(rabbitsCount).fill(0).map(() => new Rabbit(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
-        this.wolves = new Array(wolvesCount).fill(0).map(() => new Wolf(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
-        this.hunter = new Hunter(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT)
+        this.deers = CharactersGenerator.generateDeersGroup(deersCount);
+        this.rabbits = CharactersGenerator.generateRabbits(rabbitsCount);
+        this.wolves = CharactersGenerator.generateWolves(wolvesCount);
+        this.hunter = CharactersGenerator.generateHunter();
         this.objects = [...this.rabbits, ...this.wolves, ...this.deers];
     }
 
@@ -77,16 +45,11 @@ export default class Game {
         if (!this.hunter.isDead) {
             characters.push(this.hunter);
         }
-        this.objects.forEach((object) => {
-            object.simulateCurrentBehaviour(characters);
-        })
-
-        this.hunter.bullets = this.hunter.bullets.filter((bullet) => !bullet.isDead);
-
-        this.hunter.bullets.forEach((bullet) => bullet.simulateCurrentBehaviour(characters));
+        this.updateCharacters(characters);
+        this.updateBullets(characters);
 
         if (!this.hunter.isDead) {
-            this.hunter.simulateCurrentBehaviour(this.mouse);
+            this.updateHunter();
             this.field.drawBulletsAmount(this.hunter.bulletsCount, bulletsNumber);
         } else {
             bulletsAmountText.style.display = 'none';
@@ -95,6 +58,22 @@ export default class Game {
 
         requestAnimationFrame(this.updateFrame.bind(this));
     }
+
+    private updateBullets(characters): void {
+        this.hunter.bullets = this.hunter.bullets.filter((bullet) => !bullet.isDead);
+        this.hunter.bullets.forEach((bullet) => bullet.simulateCurrentBehaviour(characters));
+    }
+
+    private updateHunter(): void {
+        this.hunter.simulateCurrentBehaviour(this.mouse);
+    }
+
+    private updateCharacters(characters): void {
+        this.objects.forEach((object) => {
+            object.simulateCurrentBehaviour(characters);
+        })
+    }
+
 
     private handleMouseMove(): void {
         canvas.addEventListener('mousemove', (e) => {

@@ -10,12 +10,16 @@ export default class FallowDeer extends Character {
     this.characterType = Characters.FALLOW_DEER;
   }
 
-  private isFallowDeer(object: Character | FallowDeer): object is FallowDeer {
+  private static isFallowDeer(object: Character | FallowDeer): object is FallowDeer {
     return object.characterType === Characters.FALLOW_DEER;
   }
 
+  private retrieveDeersFromSameGroup(objects: Character[]): Character[] {
+    return objects.filter((object) => FallowDeer.isFallowDeer(object) && object?.groupId === this.groupId && object !== this)
+  }
+
   public getCurrentBehaviourForce(objects: Character[]): Vector {
-    const deers = objects.filter((object) => this.isFallowDeer(object) && object?.groupId === this.groupId && object !== this)
+    const deers = this.retrieveDeersFromSameGroup(objects);
     const wolves = objects.filter((object) => object.characterType === Characters.WOLF)
     const separationFromWolvesForce = super.separate(wolves, this.radius * 15);
 
