@@ -40,7 +40,7 @@ export default class Hunter extends Character {
   }
 
   private shot(): void {
-    if(this.bulletsCount) {
+    if(this.bulletsCount && !this.isDead) {
       const bullet = new Bullet(this.location, this.velocity.clone())
       this.bullets.push(bullet);
       this.bulletsCount--;

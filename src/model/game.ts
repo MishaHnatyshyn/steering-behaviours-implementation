@@ -12,6 +12,7 @@ import {
 } from "../constants";
 import Vector from "./vector";
 import Field from "../view/Field";
+import FallowDeer from './characters/fallowDeer';
 
 const bulletsNumber = document.getElementById('bulletsNumber');
 const bulletsAmountText = document.getElementById('bulletsAmountText');
@@ -19,6 +20,8 @@ const bulletsAmountText = document.getElementById('bulletsAmountText');
 export default class Game {
     private rabbits: Rabbit[] = []
     private wolves: Wolf[] = []
+    private deers: FallowDeer[] = []
+    private deerGroups: FallowDeer[][] = []
     private hunter: Hunter = null;
     private objects: Character[] = [];
     private mouse = new Vector(0, 0);
@@ -29,12 +32,31 @@ export default class Game {
         this.updateFrame();
     }
 
-    public startGame(rabbitsCount = DEFAULT_RABBITS_AMOUNT, wolvesCount = DEFAULT_WOLVES_AMOUNT): void{
+    public getRandIntInRange(min: number, max: number): number {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    public startGame(rabbitsCount = DEFAULT_RABBITS_AMOUNT, wolvesCount = DEFAULT_WOLVES_AMOUNT, deersCount = DEFAULT_DEERS_AMOUNT): void{
         bulletsAmountText.style.display = 'block';
+
+        const minDeerGroupsCount = Math.floor(deersCount / 8) + 1;
+        const maxDeerGroupsCount = Math.floor(deersCount / 3);
+        const deerGroupsCount = this.getRandIntInRange(minDeerGroupsCount, maxDeerGroupsCount);
+        let deersLeft = deersCount;
+        this.deers = new Array(deerGroupsCount).fill(0).map((_, index) => {
+            const maxDeersInGroup = Math.max(deersLeft, 8);
+            const deersInGroup = this.getRandIntInRange(3, maxDeersInGroup);
+            deersLeft -= deersInGroup;
+            const x = Math.random() * FIELD_WIDTH;
+            const y = Math.random() * FIELD_HEIGHT;
+            return new Array(deersInGroup).fill(0).map((_, index) => new FallowDeer(x, y, index))
+        }).flat();
+
+
         this.rabbits = new Array(rabbitsCount).fill(0).map(() => new Rabbit(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
         this.wolves = new Array(wolvesCount).fill(0).map(() => new Wolf(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
         this.hunter = new Hunter(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT)
-        this.objects = [...this.rabbits, ...this.wolves];
+        this.objects = [...this.rabbits, ...this.wolves, ...this.deers];
     }
 
     private updateFrame(): void {

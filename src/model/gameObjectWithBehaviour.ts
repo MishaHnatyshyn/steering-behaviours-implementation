@@ -91,8 +91,8 @@ export default class GameObjectWithBehaviour extends GameObject {
         }
     }
 
-    public separate(objects: GameObject[]): Vector {
-        const desiredSeparation = this.radius * 10;
+    public separate(objects: GameObject[], separationRadius? : number): Vector {
+        const desiredSeparation = separationRadius || this.radius * 5;
         const desired = new Vector(0, 0);
         let count = 0;
         objects.forEach(object => {
@@ -123,7 +123,7 @@ export default class GameObjectWithBehaviour extends GameObject {
         const alignmentForce = this.align(objects);
         const cohesionForce = this.cohesion(objects);
 
-        separationForce.mult(1.5);
+        separationForce.mult(1.3);
         alignmentForce.mult(1);
         cohesionForce.mult(1);
 
@@ -137,7 +137,7 @@ export default class GameObjectWithBehaviour extends GameObject {
 
     private align(objects: GameObject[]): Vector {
         const desired = new Vector(0, 0);
-        const neighborDist = 100;
+        const neighborDist = this.radius * 10;
         let count = 0;
         objects.forEach(object => {
             const distance = Vector.dist(this.location, object.location);
@@ -161,7 +161,7 @@ export default class GameObjectWithBehaviour extends GameObject {
 
     private cohesion(objects: GameObject[]): Vector {
         const desired = new Vector(0, 0);
-        const neighborDist = 75;
+        const neighborDist = this.radius * 10;
         let count = 0;
 
         objects.forEach(object => {
