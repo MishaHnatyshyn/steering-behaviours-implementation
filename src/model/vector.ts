@@ -11,7 +11,7 @@ export default class Vector {
         if (length !== 0) {
             this.x /= length;
             this.y /= length;
-        };
+        }
     }
 
     public get length(): number {
@@ -38,9 +38,8 @@ export default class Vector {
         return Math.atan2(this.y, this.x);
     }
 
-    public div(vector: Vector): void {
-        this.x /= vector.x;
-        this.y /= vector.y;
+    public isNull(): boolean {
+        return this.x === 0 && this.y === 0;
     }
 
     static dist(firstVector: Vector, secondVector: Vector): number {
@@ -56,9 +55,4 @@ export default class Vector {
     static sub(firstVector: Vector, secondVector: Vector): Vector {
         return new Vector(firstVector.x - secondVector.x, firstVector.y - secondVector.y);
     }
-
-    static div(vector: Vector, value: number): Vector {
-        return new Vector(vector.x / value, vector.y / value);
-    }
-
 }

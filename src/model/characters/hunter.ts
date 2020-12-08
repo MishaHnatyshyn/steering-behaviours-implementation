@@ -5,7 +5,7 @@ import Vector from "../vector";
 import {canvas} from './../../constants'
 
 export default class Hunter extends Character {
-  public baseMaxSpeed: number = 2;
+  public baseMaxSpeed: number = 3;
   public bulletsCount = 10;
   public bullets: Bullet[] = []
   public radius = 13;

@@ -4,7 +4,8 @@ import Character from '../character';
 import GameObject from '../gameObject';
 
 export default class Rabbit extends Character {
-  public baseMaxSpeed: number = 6;
+  public wanderingSpeed: number = 3;
+  public separationSpeed: number = 8;
 
   constructor(x, y) {
     super(x, y);
@@ -14,9 +15,11 @@ export default class Rabbit extends Character {
 
   public getCurrentBehaviourForce(objects: GameObject[]): Vector {
     const force: Vector = super.separate(objects)
-    if (force.x === 0 && force.y === 0) {
+    if (force.isNull()) {
+      this.baseMaxSpeed = this.wanderingSpeed;
       return this.wander()
     }
+    this.baseMaxSpeed = this.separationSpeed;
     force.mult(1.1);
     return force;
   }

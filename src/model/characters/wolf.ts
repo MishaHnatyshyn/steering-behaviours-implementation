@@ -3,7 +3,7 @@ import {Characters} from '../characters.enum';
 import Vector from '../vector';
 
 export default class Wolf extends Character {
-  public baseMaxSpeed: number = 3;
+  public baseMaxSpeed: number = 5;
   public static ENEMIES = [Characters.RABBIT, Characters.FALLOW_DEER, Characters.HUNTER];
   private power = 20;
   private readonly powerTimer: number;
@@ -46,7 +46,7 @@ export default class Wolf extends Character {
   private hunt(objects: Character[]): Vector {
     const enemies = objects.filter(object => Wolf.ENEMIES.includes(object.characterType));
 
-    const neighborDist = 100;
+    const neighborDist = this.radius * 10;
 
     const theNearestEnemy = enemies
       .map(enemy => ({ enemy, dist: Vector.dist(this.location, enemy.location)}))
@@ -59,7 +59,7 @@ export default class Wolf extends Character {
       })
       .sort((a, b) => a.dist - b.dist)[0];
     if (theNearestEnemy) {
-      return this.seek(theNearestEnemy.enemy.location)
+      return this.seek(theNearestEnemy.enemy.location);
     }
 
     return this.wander()

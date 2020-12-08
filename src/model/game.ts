@@ -43,14 +43,26 @@ export default class Game {
         const maxDeerGroupsCount = Math.floor(deersCount / 3);
         const deerGroupsCount = this.getRandIntInRange(minDeerGroupsCount, maxDeerGroupsCount);
         let deersLeft = deersCount;
-        this.deers = new Array(deerGroupsCount).fill(0).map((_, index) => {
-            const maxDeersInGroup = Math.max(deersLeft, 8);
-            const deersInGroup = this.getRandIntInRange(3, maxDeersInGroup);
+        this.deerGroups = new Array(deerGroupsCount).fill(0).map((_, index) => {
+            const groupsLeft = deerGroupsCount - index - 1;
+            const maxAvailAbleDeers = deersLeft - 3 * groupsLeft;
+            const maxDeersInGroup = Math.min(maxAvailAbleDeers, 8);
+            const deersInGroup = index === deerGroupsCount - 1 ? deersLeft : this.getRandIntInRange(3, maxDeersInGroup);
             deersLeft -= deersInGroup;
             const x = Math.random() * FIELD_WIDTH;
             const y = Math.random() * FIELD_HEIGHT;
-            return new Array(deersInGroup).fill(0).map((_, index) => new FallowDeer(x, y, index))
-        }).flat();
+            return new Array(deersInGroup).fill(0)
+                .map(() => new FallowDeer(
+                    this.getRandIntInRange(x - 10, x + 10),
+                    this.getRandIntInRange(y - 10, y + 10),
+                    index
+                    )
+                )
+        })
+
+        console.log(this.deerGroups);
+
+        this.deers = this.deerGroups.flat()
 
 
         this.rabbits = new Array(rabbitsCount).fill(0).map(() => new Rabbit(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT))
