@@ -137,11 +137,10 @@ export default class GameObjectWithBehaviour extends GameObject {
 
     private align(objects: GameObject[]): Vector {
         const desired = new Vector(0, 0);
-        const neighborDist = this.radius * 10;
         let count = 0;
         objects.forEach(object => {
             const distance = Vector.dist(this.location, object.location);
-            if (distance > 0 && distance < neighborDist) {
+            if (distance > 0) {
                 desired.add(object.velocity);
                 count++;
             }
@@ -161,12 +160,11 @@ export default class GameObjectWithBehaviour extends GameObject {
 
     private cohesion(objects: GameObject[]): Vector {
         const desired = new Vector(0, 0);
-        const neighborDist = this.radius * 10;
         let count = 0;
 
         objects.forEach(object => {
             const distance = Vector.dist(this.location, object.location);
-            if (distance > 0 && distance < neighborDist) {
+            if (distance > 0) {
                 desired.add(object.location);
                 count++;
             }
